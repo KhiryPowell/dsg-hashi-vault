@@ -127,7 +127,7 @@ jobs:
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`infra/nonprod\`, Workflow: \`${{ github.workflow }}\`*`;
 
             github.rest.issues.createComment({
-              issue_number: ${{ env.PR_NUMBER }},
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: output
