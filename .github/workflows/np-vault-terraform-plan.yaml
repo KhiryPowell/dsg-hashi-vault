@@ -1,0 +1,134 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    # Default pull request activity types. https://docs.github.com/en/actions/reference/events-that-trigger-workflows#pull_request
+    # types: [opened, synchronize, reopened]
+    paths: 
+    - 'infra/nonprod/**'
+
+jobs:
+  terraform-plan:
+
+    # Job needs to run on self-hosted runner to access vault
+    runs-on: [ self-hosted, azure ]
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # because we will be identifying changes with commit SHAs that can be at any level
+          ref: ${{ github.event.pull_request.head.ref }} # https://github.com/actions/checkout/issues/317#issuecomment-737107262
+
+      - name: install gh cli
+        run: |
+          type -p curl >/dev/null || sudo apt install curl -y
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+      
+      - name: Git Config
+        shell: bash
+        run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          mkdir -p -m 0700 $HOME/.ssh
+          ssh-keyscan github.com > $HOME/.ssh/known_hosts
+          echo "${{ secrets.SSH_KEY }}" > $HOME/.ssh/id_rsa
+          chmod 600 $HOME/.ssh/known_hosts $HOME/.ssh/id_rsa
+
+      # Node needed for Terraform setup
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ~>1.0
+
+      - name: Terraform Init
+        shell: bash
+        id: init
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          GIT_SSH_COMMAND: 'ssh -i $HOME/.ssh/id_rsa -o UserKnownHostsFile=$HOME/.ssh/known_hosts'
+        run: |
+          terraform init
+        working-directory: infra/nonprod
+
+      - name: Terraform Validate
+        id: validate
+        shell: bash
+        run: terraform validate -no-color | tr "\`" "'"
+        working-directory: infra/nonprod
+
+      - name: Terraform Plan
+        id: plan
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        shell: bash
+        run: |
+          terraform plan -no-color -input=false -out=tfplan | tr "\`" "'"
+        working-directory: infra/nonprod
+        
+      - name: Commit lock file
+        shell: bash
+        run: |
+          git add .terraform.lock.hcl
+          git diff-index --quiet HEAD || git commit -m "Commit the tf lock file"
+          git push
+        working-directory: ${{ inputs.PATH  }}
+
+      - name: Comment on PR -- terraform plan Results
+        uses: actions/github-script@v6
+        id: tf-plan-comment
+        if: '!cancelled()'
+        env:
+          PLAN: "${{ steps.plan.outputs.stdout }}"
+          ERRORS: "${{ steps.plan.outputs.stderr }}"
+          output: output
+        with:
+          script: |
+            const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            <details><summary>Validation Output</summary>
+
+            \`\`\`\n
+            ${{ steps.validate.outputs.stdout }}
+            \`\`\`
+
+            </details>
+
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            <details><summary>Show Plan Errors</summary>
+
+            \`\`\`\n
+            ${process.env.ERRORS}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`infra/nonprod\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: ${{ env.PR_NUMBER }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
