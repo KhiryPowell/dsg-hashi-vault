@@ -77,6 +77,11 @@ jobs:
         run: |
           terraform plan -no-color -input=false -out=tfplan | tr "\`" "'"
         working-directory: infra/nonprod
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: tfplan
+          path: infra/nonprod/tfplan
         
       - name: Commit lock file
         shell: bash
@@ -84,7 +89,7 @@ jobs:
           git add .terraform.lock.hcl
           git diff-index --quiet HEAD || git commit -m "Commit the tf lock file"
           git push
-        working-directory: ${{ inputs.PATH  }}
+        working-directory: infra/nonprod
 
       - name: Comment on PR -- terraform plan Results
         uses: actions/github-script@v6
@@ -132,3 +137,124 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
+  
+  terraform-apply:
+    runs-on: [ self-hosted, azure ]
+    needs: terraform-plan
+    environment: nonprod
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # because we will be identifying changes with commit SHAs that can be at any level
+          ref: ${{ github.event.pull_request.head.ref }} # https://github.com/actions/checkout/issues/317#issuecomment-737107262
+
+      - name: install gh cli
+        run: |
+          type -p curl >/dev/null || sudo apt install curl -y
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+      
+      - name: Git Config
+        shell: bash
+        run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          mkdir -p -m 0700 $HOME/.ssh
+          ssh-keyscan github.com > $HOME/.ssh/known_hosts
+          echo "${{ secrets.SSH_KEY }}" > $HOME/.ssh/id_rsa
+          chmod 600 $HOME/.ssh/known_hosts $HOME/.ssh/id_rsa
+
+      # Node needed for Terraform setup
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ~>1.0
+
+      - name: Terraform Init
+        shell: bash
+        id: init
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          GIT_SSH_COMMAND: 'ssh -i $HOME/.ssh/id_rsa -o UserKnownHostsFile=$HOME/.ssh/known_hosts'
+        run: |
+          terraform init
+        working-directory: infra/nonprod
+      
+      - uses: actions/download-artifact@master
+        with:
+          name: tfplan
+          path: infra/nonprod/tfplan
+
+      - name: Terraform Apply
+        id: apply
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        shell: bash
+        run: terraform apply -no-color -auto-approve tfplan
+        working-directory: infra/nonprod
+
+      - name: Comment on PR -- terraform apply Results
+        uses: actions/github-script@v6
+        id: tf-apply-comment
+        if: '!cancelled()'
+        env:
+          APPLY: "${{ steps.apply.outputs.stdout }}"
+          ERRORS: "${{ steps.apply.outputs.stderr }}"
+          output: output
+        with:
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            <details><summary>Validation Output</summary>
+
+            \`\`\`\n
+            ${{ steps.validate.outputs.stdout }}
+            \`\`\`
+
+            </details>
+
+            #### Terraform Apply 📖\`${{ steps.apply.outcome }}\`
+
+            <details><summary>Show Apply</summary>
+
+            \`\`\`\n
+            ${process.env.APPLY}
+            \`\`\`
+
+            </details>
+
+            <details><summary>Show Apply Errors</summary>
+
+            \`\`\`\n
+            ${process.env.ERRORS}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.PATH  }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Merge PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: | 
+          gh pr merge ${{ github.event.pull_request.head.ref }} --squash 
