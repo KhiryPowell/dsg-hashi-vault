@@ -193,7 +193,13 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: tfplan
-          path: infra/nonprod/tfplan
+          path: infra/nonprod/
+
+      - name: Check files
+        run: |
+          ls -al
+          ls -al tfplan
+        working-directory: infra/nonprod
 
       - name: Terraform Apply
         id: apply
