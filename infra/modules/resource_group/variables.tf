@@ -14,10 +14,11 @@ variable "env" {
   type        = string
 }
 
-variable "service_principal_id" {
-  description = "Service Principal ID."
-  type        = string
-}
+# using sp-azure-onboarding until security figures out what to do
+# variable "service_principal_id" {
+#   description = "Service Principal ID."
+#   type        = string
+# }
 
 variable "tags" {
   description = "A map of tags (key-value pairs) passed to resources."

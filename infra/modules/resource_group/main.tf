@@ -36,11 +36,12 @@ resource "azurerm_resource_group" "rg" {
   # }
 }
 
-resource "azurerm_role_assignment" "sp" {
-  scope                = azurerm_resource_group.rg.id
-  role_definition_name = "DSG Deployer"
-  principal_id         = var.service_principal_id
-}
+# using sp-azure-onboarding until security figures out what to do
+# resource "azurerm_role_assignment" "sp" {
+#   scope                = azurerm_resource_group.rg.id
+#   role_definition_name = "DSG Deployer"
+#   principal_id         = var.service_principal_id
+# }
 
 resource "azurerm_role_assignment" "team" {
   scope                = azurerm_resource_group.rg.id

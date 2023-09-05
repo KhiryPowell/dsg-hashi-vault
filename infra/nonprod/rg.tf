@@ -1,6 +1,6 @@
 module "rg" {
   source               = "../modules/resource_group"
-  service_principal_id = local.service_principal_id
+  # service_principal_id = local.service_principal_id #using sp-azure-onboarding until we hear from security
   workload_name        = "vault"
   env                  = local.environment
   team_group           = local.team_group

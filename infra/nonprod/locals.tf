@@ -1,5 +1,5 @@
 locals {
-  service_principal_id = "cc198c17-41d1-4562-b6fa-d789b72999ec" #srv-developerenablement-np 
+  # service_principal_id = "cc198c17-41d1-4562-b6fa-d789b72999ec" #srv-developerenablement-np, using sp-azure-onboarding until we hear from security
   environment = "np"
   location = "eastus"
   team_group = "developerenablement"
