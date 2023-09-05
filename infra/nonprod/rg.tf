@@ -1,0 +1,9 @@
+module "rg" {
+  source               = "../modules/resource_group"
+  service_principal_id = local.service_principal_id
+  workload_name        = "vault"
+  env                  = local.environment
+  team_group           = local.team_group
+  location = local.location
+  tags = local.tags
+}
