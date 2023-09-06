@@ -7,37 +7,30 @@ terraform {
   }
 }
 
-resource "random_password" "temp_password" {
-  length = 16
-  special = true
-  override_special = "_%@"
-}
-
 # Create network interface
-resource "azurerm_network_interface" "my_terraform_nic" {
+resource "azurerm_network_interface" "vm" {
 
   name                = "nic-${var.vm_name}"
   location            = var.location
   resource_group_name = var.resource_group
 
   ip_configuration {
-    name                          = "nic_configuration-${var.vm_name}-ue-np"
+    name                          = "nic_configuration-${var.vm_name}"
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Dynamic"
   }
 }
 
-resource "tls_private_key" "example" {
+resource "tls_private_key" "ssh" {
   algorithm = "RSA"
 }
 
-
 # Create virtual machine
-resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
+resource "azurerm_linux_virtual_machine" "vm" {
   name                  = var.vm_name
   location              = var.location
   resource_group_name   = var.resource_group
-  network_interface_ids = [azurerm_network_interface.my_terraform_nic.id]
+  network_interface_ids = [azurerm_network_interface.vm.id]
   size                  = var.vm_size
   zone                  = var.avail_zone
 
@@ -45,18 +38,16 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     name                 = "${var.vm_name}-OSDISK"
     caching              = "ReadWrite"
     storage_account_type = var.disk_type
+    disk_size_gb         = var.disk_size_gb
   }
 
   source_image_id = var.os_image
-  
-  admin_username                  = "azureuser"
-  # admin_password                  = random_password.temp_password.result
- 
-  # disable_password_authentication = false
+
+  admin_username = "azureuser"
 
   admin_ssh_key {
-   username   = "azureuser"
-   public_key = tls_private_key.example.public_key_openssh
+    username   = "azureuser"
+    public_key = tls_private_key.ssh.public_key_openssh
   }
 
   #boot_diagnostics {

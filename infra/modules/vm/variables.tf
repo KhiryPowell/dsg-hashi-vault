@@ -1,16 +1,16 @@
 variable "vm_name" {
   type = string
 }
-variable "vm_size"  {
+variable "vm_size" {
   type = string
 }
-variable "location"  {
+variable "location" {
   type = string
 }
 variable "resource_group" {
   type = string
 }
-variable  "avail_zone" {
+variable "avail_zone" {
   type = string
 }
 variable "os_image" {
@@ -21,4 +21,7 @@ variable "disk_type" {
 }
 variable "subnet_id" {
   type = string
+}
+variable "disk_size_gb" {
+  type = number
 }

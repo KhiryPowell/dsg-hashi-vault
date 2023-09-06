@@ -17,8 +17,8 @@ data "azuread_group" "team" {
 }
 
 module "tf_tagging" {
-  source  = "git@github.com:dsg-tech/terraform-dsg-azure-tagging.git"
-  
+  source = "git@github.com:dsg-tech/terraform-dsg-azure-tagging.git"
+
   user_tags = var.tags
 }
 
@@ -50,7 +50,7 @@ resource "azurerm_role_assignment" "team" {
 }
 
 data "azurerm_policy_definition" "dsg_deny_principal" {
-  name = "deny_principal_assignment_on_scope"
+  name                  = "deny_principal_assignment_on_scope"
   management_group_name = "mg-dsg"
 }
 
