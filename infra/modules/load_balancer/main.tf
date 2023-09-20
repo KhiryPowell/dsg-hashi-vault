@@ -52,7 +52,7 @@ resource "azurerm_lb_probe" "health_probe" {
   port            = 8200
   protocol        = "Http"
   probe_threshold = 1
-  request_path = "/sys/health"
+  request_path = "/v1/sys/health"
   interval_in_seconds = 15
   number_of_probes = 2
 }
