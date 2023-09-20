@@ -1,3 +1,6 @@
+variable "backend_address_pool_id" {
+  type = string
+}
 variable "vm_name" {
   type = string
 }

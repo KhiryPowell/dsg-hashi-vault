@@ -18,7 +18,9 @@ resource "azurerm_key_vault_access_policy" "DeveloperEnablement" {
   key_vault_id = module.keyvault.key_vault_id
   tenant_id    = "e04b15c8-7a1e-4390-9b5b-28c7c205a233"
   object_id    = local.de_object_id
-
+  certificate_permissions = []
+  secret_permissions = []
+  storage_permissions = []
   key_permissions = [
     "Backup",
     "Create",

@@ -21,6 +21,12 @@ resource "azurerm_network_interface" "vm" {
   }
 }
 
+resource "azurerm_network_interface_backend_address_pool_association" "example" {
+  network_interface_id    = azurerm_network_interface.vm.id
+  ip_configuration_name   = "nic_configuration-${var.vm_name}"
+  backend_address_pool_id = var.backend_address_pool_id
+}
+
 resource "tls_private_key" "ssh" {
   algorithm = "RSA"
 }
