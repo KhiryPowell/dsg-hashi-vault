@@ -8,8 +8,6 @@ module "load_balancer" {
   tags                = local.tags
 }
 
-
-
 # tls {
 #   defaults {
 #      ca_file = "/etc/consul.d/certs/consul-agent-ca.pem"
