@@ -50,7 +50,7 @@ resource "azurerm_lb_probe" "health_probe" {
   loadbalancer_id = azurerm_lb.vault_lb.id
   name            = "vault-health-probe"
   port            = 8200
-  protocol        = "Http"
+  protocol        = "Https"
   probe_threshold = 1
   request_path = "/v1/sys/health"
   interval_in_seconds = 15

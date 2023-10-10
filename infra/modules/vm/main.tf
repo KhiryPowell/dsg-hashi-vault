@@ -22,6 +22,7 @@ resource "azurerm_network_interface" "vm" {
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "vault_backend_pool" {
+  count = var.backend_address_pool_id != "" ? 1 : 0
   network_interface_id    = azurerm_network_interface.vm.id
   ip_configuration_name   = "nic_configuration-${var.vm_name}"
   backend_address_pool_id = var.backend_address_pool_id

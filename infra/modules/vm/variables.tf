@@ -1,5 +1,6 @@
 variable "backend_address_pool_id" {
   type = string
+  default = ""
 }
 variable "vm_name" {
   type = string
