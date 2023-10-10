@@ -61,3 +61,8 @@ resource "azurerm_network_security_rule" "Allow_ansible" {
   resource_group_name         = module.rg.resource_group_name
   network_security_group_name = module.nsg.name
 }
+
+resource "azurerm_subnet_network_security_group_association" "vault" {
+  subnet_id                 = local.vm_subnet_id
+  network_security_group_id = module.nsg.id
+}
