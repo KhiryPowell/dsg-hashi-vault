@@ -45,8 +45,8 @@ ssh -i ~/.ssh/vault_tls_private_key04 azureuser@{ip address of vm04}
 ssh -i ~/.ssh/vault_tls_private_key05 azureuser@{ip address of vm05}
 ```
 
-The Vault binary is installed on vm01 and vm02
-The Consul binary is installed on all 5 vms to create a HA cluster
+Install Consul binary 1.8.2 and configure Consul first on all 5 vms to create a HA cluster
+Install Vault binary 1.5.4 on vm01 and vm02 after Consul is configured
 
 Place tools tls certs for Vault in the following path 
 ```
