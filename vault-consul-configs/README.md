@@ -134,7 +134,9 @@ Configs for VM05
 ```
 
 Consul Snapshot Restore
+
 To restore the consul Snapshot, follow the steps here: https://dcsgcloud.atlassian.net/wiki/spaces/DEV/pages/20487732/Vault+Restore+Procedures+from+Backup
 
 Extract Snapshot File
+
 Restore Snapshot (STOP at Step3. Step 3 points to VP01 recovery keys so make sure it's VN01 as I did this for nonprod)
