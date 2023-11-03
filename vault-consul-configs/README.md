@@ -155,6 +155,7 @@ sudo apt update && sudo apt install vault
 
 
 ***Migrate from Consul to Raft***
+
 Migration steps are found here: https://developer.hashicorp.com/vault/tutorials/raft/raft-migration
 
 On the Consul server cluster that contains the Vault data to be saved in a snapshot, execute the following command from either a Consul server directly or any system running a Consul client agent connected to the server cluster.
@@ -216,6 +217,7 @@ To look at raft peers run the following.
 vault operator raft list-peers -tls-server-name="vault-az-np.tools.dcsg.com"
 ```
 ***New Vault Configs***
+
 After completing the migration, update the configs for Vault
 
 New configs files for vault are located under vm folder
