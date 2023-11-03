@@ -145,6 +145,7 @@ To restore the consul Snapshot, follow the steps here: https://dcsgcloud.atlassi
 Extract Snapshot File
 
 Restore Snapshot (STOP at Step3. Step 3 points to VP01 recovery keys so make sure it's VN01 as I did this for nonprod)
+
 ***Update/Install latest version of Vault***
 
 ```
@@ -216,6 +217,7 @@ To look at raft peers run the following.
 ```
 vault operator raft list-peers -tls-server-name="vault-az-np.tools.dcsg.com"
 ```
+
 ***New Vault Configs***
 
 After completing the migration, update the configs for Vault
