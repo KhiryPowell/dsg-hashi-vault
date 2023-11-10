@@ -1,0 +1,41 @@
+name: Backup Vault Raft Data
+
+on:
+  workflow_dispatch:  # Enable manual triggering
+  push:
+    branches:
+      - master  # Trigger on pushes to the main branch
+
+jobs:
+  backup-vault:
+    runs-on: [ self-hosted, azure ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Vault
+        uses: hashicorp/setup-vault@v2
+        with:
+          url: https://vault-az-n.tools.dcsg.com
+          vault-version: '1.8.2'
+          vault-token: ${{ secrets.VAULT_TOKEN }}
+
+      - name: Backup Vault Raft Data
+        run: |
+          # Generate a timestamp
+          timestamp=$(date +"%Y%m%d%H%M%S")
+          
+          # Your backup script or commands to backup Vault Raft data
+          # Example: Save snapshot with timestamp in the name
+          vault operator raft snapshot save /path/to/backup_${timestamp}.snap
+
+      # - name: Install Azure CLI
+      #   run: |
+      #     sudo apt-get update && sudo apt-get install -y azure-cli
+
+      # - name: Upload Backup to Azure Storage
+      #   run: |
+      #     # Replace 'your-storage-account-name' and 'your-container-name' with your Azure Storage Account and Container names
+      #     az storage blob upload --account-name your-storage-account-name --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name your-container-name --type block --name backup_${timestamp}.snap --type block --content-type application/octet-stream --content-encoding gzip --type block --file /path/to/backup_${timestamp}.snap
+ 
