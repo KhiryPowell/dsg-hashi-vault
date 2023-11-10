@@ -19,8 +19,6 @@ jobs:
         with:
           url: https://vault-az-np.tools.dcsg.com
           token: ${{ secrets.VAULT_TOKEN }}
-
-      - name: Backup Vault Raft Data
         run: |
           # Generate a timestamp
           timestamp=$(date +"%Y%m%d%H%M%S")
