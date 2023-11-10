@@ -19,13 +19,14 @@ jobs:
         with:
           url: https://vault-az-np.tools.dcsg.com
           token: ${{ secrets.VAULT_TOKEN }}
+          
+      - name: Backup Vault Raft Data    
         run: |
           # Generate a timestamp
           timestamp=$(date +"%Y%m%d%H%M%S")
           
-          # Your backup script or commands to backup Vault Raft data
-          # Example: Save snapshot with timestamp in the name
-          vault operator raft snapshot save /path/to/backup_${timestamp}.snap
+          # Command to backup Vault Raft data & Save snapshot with timestamp in the name
+          vault operator raft snapshot save backup_${timestamp}.snap
 
       # - name: Install Azure CLI
       #   run: |
