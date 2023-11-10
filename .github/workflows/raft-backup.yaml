@@ -18,8 +18,7 @@ jobs:
         uses: hashicorp/setup-vault@v2
         with:
           url: https://vault-az-np.tools.dcsg.com
-          vault-version: '1.8.2'
-          vault-token: ${{ secrets.VAULT_TOKEN }}
+          token: ${{ secrets.VAULT_TOKEN }}
 
       - name: Backup Vault Raft Data
         run: |
