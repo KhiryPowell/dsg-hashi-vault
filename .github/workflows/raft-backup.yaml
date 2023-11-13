@@ -27,12 +27,23 @@ jobs:
           sudo apt update && sudo apt install vault
           vault --version
 
-      - name: SSH into Vault Server
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > vault_tls_private_key
-          chmod 600 vault_tls_private_key
-          ssh -i vault_tls_private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }} -- "sh -c 'vault --version'"
-          # vault operator raft list-peers -tls-server-name="vault-az-np.tools.dcsg.com"
+      - name: SSH into Azure VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VAULT_IP }}
+          username: ${{ secrets.VAULT_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Commands to execute on the Azure VM
+            echo "Hello from Azure VM!"
+            vault operator raft list-peers -tls-server-name="vault-az-np.tools.dcsg.com"
+            
+      # - name: SSH into Vault Server
+      #   run: |
+      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > vault_tls_private_key
+      #     chmod 600 vault_tls_private_key
+      #     ssh -i vault_tls_private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }} -- "sh -c 'vault --version'"
+      #     # vault operator raft list-peers -tls-server-name="vault-az-np.tools.dcsg.com"
           
       # - name: Backup Vault Raft Data    
       #   run: |
