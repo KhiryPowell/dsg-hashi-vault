@@ -34,12 +34,13 @@ jobs:
           username: ${{ secrets.VAULT_USER }}
           key: ${{ secrets.VAULT_PRIVATE_KEY }}
           script: |
+            export VAULT_TLS_SERVER_NAME=vault-az-np.tools.dcsg.com
             # Commands to execute on the Azure VM
-            vault operator raft list-peers -tls-server-name="vault-az-np.tools.dcsg.com"
+            vault operator raft list-peers 
             # Generate a timestamp
             timestamp=$(date +"%Y%m%d%H%M%S")
             # Command to backup Vault Raft data & Save snapshot with timestamp in the name
-            vault operator raft snapshot save backup_${timestamp}.snap -tls-server-name="vault-az-np.tools.dcsg.com"
+            vault operator raft snapshot save backup_${timestamp}.snap
             
       # - name: SSH into Vault Server
       #   run: |
