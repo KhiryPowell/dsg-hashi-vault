@@ -26,6 +26,11 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
           sudo apt update && sudo apt install vault
           vault --version
+
+      - name: SSH into Vault Server
+        run: |
+          ssh -i ${{ secrets.VAULT_PRIVATE_KEY }} ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}
+          vault operator raft list-peers -tls-server-name="vault-az-np.tools.dcsg.com"
           
       # - name: Backup Vault Raft Data    
       #   run: |
