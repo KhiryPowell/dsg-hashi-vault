@@ -14,11 +14,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup Vault
-        uses: hashicorp/vault-action@v2
-        with:
-          url: https://vault-az-np.tools.dcsg.com
-          token: ${{ secrets.VAULT_TOKEN }}
+      # - name: Setup Vault
+      #   uses: hashicorp/vault-action@v2
+      #   with:
+      #     url: https://vault-az-np.tools.dcsg.com
+      #     token: ${{ secrets.VAULT_TOKEN }}
 
       # - name: Install Vault
       #   run: |
@@ -35,8 +35,11 @@ jobs:
           key: ${{ secrets.VAULT_PRIVATE_KEY }}
           script: |
             # Commands to execute on the Azure VM
-            echo "Hello from Azure VM!"
             vault operator raft list-peers -tls-server-name="vault-az-np.tools.dcsg.com"
+            # Generate a timestamp
+            timestamp=$(date +"%Y%m%d%H%M%S")
+            # Command to backup Vault Raft data & Save snapshot with timestamp in the name
+            vault operator raft snapshot save backup_${timestamp}.snap
             
       # - name: SSH into Vault Server
       #   run: |
