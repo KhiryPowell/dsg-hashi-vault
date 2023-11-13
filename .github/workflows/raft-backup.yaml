@@ -29,9 +29,9 @@ jobs:
 
       - name: SSH into Vault Server
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
-          ssh -i private_key.pem ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > vault_tls_private_key
+          chmod 600 vault_tls_private_key
+          ssh -i vault_tls_private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}
           vault operator raft list-peers -tls-server-name="vault-az-np.tools.dcsg.com"
           
       # - name: Backup Vault Raft Data    
