@@ -39,7 +39,7 @@ jobs:
             # Generate a timestamp
             timestamp=$(date +"%Y%m%d%H%M%S")
             # Command to backup Vault Raft data & Save snapshot with timestamp in the name
-            vault operator raft snapshot save backup_${timestamp}.snap
+            vault operator raft snapshot save backup_${timestamp}.snap -tls-server-name="vault-az-np.tools.dcsg.com"
             
       # - name: SSH into Vault Server
       #   run: |
