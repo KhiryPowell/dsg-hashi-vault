@@ -14,20 +14,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # - name: Setup Vault
-      #   uses: hashicorp/vault-action@v2
-      #   with:
-      #     url: https://vault-az-np.tools.dcsg.com
-      #     token: ${{ secrets.VAULT_TOKEN }}
-
-      # - name: Install Vault
-      #   run: |
-      #     wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-      #     echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-      #     sudo apt update && sudo apt install vault
-      #     vault --version
-
       - name: SSH into Azure VM
+        id: ssh-vault-vm
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VAULT_IP }}
@@ -41,21 +29,6 @@ jobs:
             timestamp=$(date +"%Y%m%d%H%M%S")
             # Command to backup Vault Raft data & Save snapshot with timestamp in the name
             vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${timestamp}.snap
-            
-      # - name: SSH into Vault Server
-      #   run: |
-      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > vault_tls_private_key
-      #     chmod 600 vault_tls_private_key
-      #     ssh -i vault_tls_private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }} -- "sh -c 'vault --version'"
-      #     # vault operator raft list-peers -tls-server-name="vault-az-np.tools.dcsg.com"
-          
-      # - name: Backup Vault Raft Data    
-      #   run: |
-      #     # Generate a timestamp
-      #     timestamp=$(date +"%Y%m%d%H%M%S")
-          
-      #     # Command to backup Vault Raft data & Save snapshot with timestamp in the name
-      #     vault operator raft snapshot save backup_${timestamp}.snap
 
       # - name: Install Azure CLI
       #   run: |
