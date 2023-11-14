@@ -55,4 +55,4 @@ jobs:
               --container-name ${{ secrets.ARM_SC }} \
               --name backup_${TIMESTAMP}.snap \
               --type block \
-              --content "$new_snapshot"
+              --file "$new_snapshot"
