@@ -43,6 +43,8 @@ jobs:
 
       - name: Debug Info
         run: |
+          new_snapshot=${{ needs.ssh-vault-vm.outputs.raft-snapshot }}
+          echo "Snapshot Path: $new_snapshot"
           echo "Snapshot Path: ${{ needs.ssh-vault-vm.outputs.raft-snapshot }}"
           ls -al "${{ needs.ssh-vault-vm.outputs.raft-snapshot }}"
 
