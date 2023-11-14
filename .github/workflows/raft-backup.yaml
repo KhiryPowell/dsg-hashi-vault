@@ -52,7 +52,7 @@ jobs:
       
             az storage blob upload \
               --account-name ${{ secrets.ARM_SA }} \
-              --container-name ${{ secrets.ARM_SC }} \
+              --container-name raftbackup \
               --name backup_${TIMESTAMP}.snap \
               --type block \
               --file "$new_snapshot"
