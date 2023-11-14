@@ -38,13 +38,18 @@ jobs:
             # Output the snapshot file path
             echo "::set-output name=raft-snapshot::/vault/raft/raft/snapshots/backup_${timestamp}.snap"
 
-
-      # - name: Install Azure CLI
-      #   run: |
-      #     sudo apt-get update && sudo apt-get install -y azure-cli
-
-      # - name: Upload Backup to Azure Storage
-      #   run: |
-      #     # Replace 'your-storage-account-name' and 'your-container-name' with your Azure Storage Account and Container names
-      #     az storage blob upload --account-name your-storage-account-name --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name your-container-name --type block --name backup_${timestamp}.snap --type block --content-type application/octet-stream --content-encoding gzip --type block --file /path/to/backup_${timestamp}.snap
- 
+      - name: Upload Snapshot to Azure Storage
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.78
+          inlineScript: |
+            new_snapshot=${{ needs.ssh-vault-vm.outputs.raft-snapshot }}
+      
+            az login --service-principal --username ${{ secrets.ARM_CLIENT_ID }} --password ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
+      
+            az storage blob upload \
+              --account-name ${{ secrets.ARM_SA }} \
+              --container-name ${{ secrets.ARM_SC }} \
+              --name backup_${{ timestamp }}.snap \
+              --type block \
+              --content $new_snapshot
