@@ -36,7 +36,7 @@ jobs:
             vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${timestamp}.snap
             
             # Output the snapshot file path
-            echo "::set-output name=raft-snapshot::/vault/raft/raft/snapshots/backup_${timestamp}.snap
+            echo "::set-output name=raft-snapshot::/vault/raft/raft/snapshots/backup_${timestamp}.snap"
 
 
       # - name: Install Azure CLI
