@@ -43,8 +43,8 @@ jobs:
 
       - name: Debug Info
         run: |
-          echo "Snapshot Path: ${{ needs.ssh-command.outputs.snapshot-file-path }}"
-          ls -al "${{ needs.ssh-command.outputs.snapshot-file-path }}"
+          echo "Snapshot Path: ${{ needs.ssh-vault-vm.outputs.raft-snapshot }}"
+          ls -al "${{ needs.ssh-vault-vm.outputs.raft-snapshot }}"
 
       - name: Upload Snapshot to Azure Storage
         uses: azure/CLI@v1
