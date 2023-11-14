@@ -13,6 +13,9 @@ jobs:
     outputs:
       value: ${{ steps.ssh-vault-vm.outputs.raft-snapshot }}
 
+    env:
+      TIMESTAMP: ''
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -30,13 +33,13 @@ jobs:
             vault operator raft list-peers 
             
             # Generate a timestamp
-            timestamp=$(date +"%Y%m%d%H%M%S")
+            export TIMESTAMP=$(date +"%Y%m%d%H%M%S")
             
             # Command to backup Vault Raft data & Save snapshot with timestamp in the name
             vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${timestamp}.snap
             
             # Output the snapshot file path
-            echo "::set-output name=raft-snapshot::/vault/raft/raft/snapshots/backup_${timestamp}.snap"
+            echo "::set-output name=raft-snapshot::/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap"
 
       - name: Upload Snapshot to Azure Storage
         uses: azure/CLI@v1
@@ -50,6 +53,6 @@ jobs:
             az storage blob upload \
               --account-name ${{ secrets.ARM_SA }} \
               --container-name ${{ secrets.ARM_SC }} \
-              --name backup_${{ timestamp }}.snap \
+              --name backup_${TIMESTAMP}.snap \
               --type block \
               --content $new_snapshot
