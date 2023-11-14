@@ -49,10 +49,12 @@ jobs:
             new_snapshot=${{ needs.ssh-vault-vm.outputs.raft-snapshot }}
       
             az login --service-principal --username ${{ secrets.ARM_CLIENT_ID }} --password ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
-      
+
+            az account set --subscription ${{ secrets.ARM_NPVAULT_SUB }}
+            
             az storage blob upload \
-              --account-name stdsgvaultnpue \
-              --container-name raftbackup \
+              --account-name ${{ secrets.ARM_SA }} \
+              --container-name ${{ secrets.ARM_SC }} \
               --name backup_${TIMESTAMP}.snap \
               --type block \
               --file "$new_snapshot"
