@@ -51,8 +51,8 @@ jobs:
             az login --service-principal --username ${{ secrets.ARM_CLIENT_ID }} --password ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
       
             az storage blob upload \
-              --account-name ${{ secrets.ARM_SA }} \
+              --account-name stdsgvaultnpue \
               --container-name raftbackup \
               --name backup_${TIMESTAMP}.snap \
               --type block \
-              --file "$new_snapshot"
+              --file $new_snapshot
