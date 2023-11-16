@@ -38,12 +38,21 @@ jobs:
             # Command to backup Vault Raft data & Save snapshot with timestamp in the name
             vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap
 
-      - name: Convert Key Secret to File
-        id: create-key
-        run: |
-         echo "${{ secrets.VAULT_PRIVATE_KEY }}" > ~/private_key && chmod 600 ~/private_key
-         ls -al ~/
-         scp -i ~/private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
+      - name: Copy File
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VAULT_IP }}
+          username: ${{ secrets.VAULT_USER }}
+          key: ${{ secrets.VAULT_PRIVATE_KEY }}
+          source: "/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap"
+          target: "~/"
+      
+      # - name: Convert Key Secret to File
+      #   id: create-key
+      #   run: |
+      #    echo "${{ secrets.VAULT_PRIVATE_KEY }}" > ~/private_key && chmod 600 ~/private_key
+      #    ls -al ~/
+      #    scp -i ~/private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
           
 
       # - name: Upload Snapshot to Azure Storage
