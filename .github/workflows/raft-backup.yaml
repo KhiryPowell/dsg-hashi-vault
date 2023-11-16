@@ -40,12 +40,12 @@ jobs:
 
       - name: Convert Key Secret to File
         run: |
-         echo "${{ secrets.VAULT_PRIVATE_KEY }}" > ~/.ssh/private_key && chmod 600 ~/.ssh/private_key
-          ls -al ~/.ssh
+         echo "${{ secrets.VAULT_PRIVATE_KEY }}" > ~/private_key && chmod 600 ~/private_key
+         ls -al ~/
       
       - name: Copy Backup to Workspace
         run: |
-          scp -i ~/.ssh/private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
+          scp -i ~/private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
           ls -al
 
       # - name: Upload Snapshot to Azure Storage
