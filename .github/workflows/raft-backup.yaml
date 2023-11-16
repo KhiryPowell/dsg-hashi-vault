@@ -36,7 +36,7 @@ jobs:
             export TIMESTAMP=$(date +"%Y%m%d%H%M%S")
             
             # Command to backup Vault Raft data & Save snapshot with timestamp in the name
-            vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${timestamp}.snap
+            vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap
             
             # Output the snapshot file path
             echo "RAFT_SNAPSHOT=/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap" >> $env:GITHUB_OUTPUT
