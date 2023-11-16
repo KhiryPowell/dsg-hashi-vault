@@ -43,13 +43,9 @@ jobs:
         run: |
          echo "${{ secrets.VAULT_PRIVATE_KEY }}" > ~/private_key && chmod 600 ~/private_key
          ls -al ~/
-      
-      - name: Copy Backup to Workspace
-        if: steps.create-key.outcome == 'success'
-        run: |
+         scp -i ~/private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
           ls -al
-          scp -i ~/private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
-          ls -al
+          
 
       # - name: Upload Snapshot to Azure Storage
       #   uses: azure/CLI@v1
