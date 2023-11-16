@@ -38,9 +38,14 @@ jobs:
             # Command to backup Vault Raft data & Save snapshot with timestamp in the name
             vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap
 
+      - name: Convert Key Secret to File
+        run: |
+         echo "${{ secrets.VAULT_PRIVATE_KEY }}" > ~/.ssh/private_key && chmod 600 ~/.ssh/private_key
+          ls -al
+      
       - name: Copy Backup to Workspace
         run: |
-          scp -i ${{ secrets.VAULT_PRIVATE_KEY }} ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
+          scp -i ~/.ssh/private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
           ls -al
 
       # - name: Upload Snapshot to Azure Storage
