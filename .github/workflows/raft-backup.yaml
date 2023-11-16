@@ -41,6 +41,10 @@ jobs:
             # Output the snapshot file path
             echo "RAFT_SNAPSHOT=/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap" >> $env:GITHUB_OUTPUT
 
+      - name: Debug Info
+        run: |
+          echo "Snapshot Path: ${{ needs.ssh-vault-vm.outputs.RAFT_SNAPSHOT }}"
+
       - name: Upload Snapshot to Azure Storage
         uses: azure/CLI@v1
         env: 
