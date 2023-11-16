@@ -10,8 +10,8 @@ jobs:
   backup-vault:
     runs-on: [ self-hosted, azure ]
 
-    outputs:
-      value: ${{ steps.ssh-vault-vm.outputs.raft-snapshot }}
+    # outputs:
+    #   raftsnapshot: ${{ steps.ssh-vault-vm.outputs.raft_snapshot }}
 
     env:
       TIMESTAMP: ''
@@ -39,22 +39,15 @@ jobs:
             vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${timestamp}.snap
             
             # Output the snapshot file path
-            echo "::set-output name=raft-snapshot::/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap"
-
-      - name: Debug Info
-        run: |
-          new_snapshot=${{ needs.ssh-vault-vm.outputs.raft-snapshot }}
-          echo "Snapshot Path: $new_snapshot"
-          echo "Snapshot Path: ${{ needs.ssh-vault-vm.outputs.raft-snapshot }}"
-          ls -al "${{ needs.ssh-vault-vm.outputs.raft-snapshot }}"
+            echo "RAFT_SNAPSHOT=/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap" >> $GITHUB_OUTPUT
 
       - name: Upload Snapshot to Azure Storage
         uses: azure/CLI@v1
+        env: 
+          RAFT_SNAPSHOT: ${{ steps.ssh-vault-vm.outputs.RAFT_SNAPSHOT }}
         with:
           azcliversion: 2.0.78
           inlineScript: |
-            new_snapshot=${{ needs.ssh-vault-vm.outputs.raft-snapshot }}
-      
             az login --service-principal --username ${{ secrets.ARM_CLIENT_ID }} --password ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
 
             az account set --subscription ${{ secrets.ARM_NPVAULT_SUB }}
@@ -64,4 +57,4 @@ jobs:
               --container-name ${{ secrets.ARM_SC }} \
               --name backup_${TIMESTAMP}.snap \
               --type block \
-              --file "$new_snapshot"
+              --file "$RAFT_SNAPSHOT"
