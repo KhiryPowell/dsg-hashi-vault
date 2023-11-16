@@ -38,14 +38,14 @@ jobs:
             # Command to backup Vault Raft data & Save snapshot with timestamp in the name
             vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap
 
-      - name: Copy File
+      - name: Copy snapshot from VM to runner
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.VAULT_IP }}
           username: ${{ secrets.VAULT_USER }}
           key: ${{ secrets.VAULT_PRIVATE_KEY }}
           source: "/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap"
-          target: "~/"
+          target: "./backup_${TIMESTAMP}.snap"
       
       # - name: Convert Key Secret to File
       #   id: create-key
