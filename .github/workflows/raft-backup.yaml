@@ -45,6 +45,7 @@ jobs:
       
       - name: Copy Backup to Workspace
         run: |
+          ls -al
           scp -i ~/private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
           ls -al
 
