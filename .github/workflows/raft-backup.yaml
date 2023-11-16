@@ -39,7 +39,7 @@ jobs:
             vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${timestamp}.snap
             
             # Output the snapshot file path
-            echo "RAFT_SNAPSHOT=/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap" >> $GITHUB_OUTPUT
+            echo "RAFT_SNAPSHOT=/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap" >> $env:GITHUB_OUTPUT
 
       - name: Upload Snapshot to Azure Storage
         uses: azure/CLI@v1
