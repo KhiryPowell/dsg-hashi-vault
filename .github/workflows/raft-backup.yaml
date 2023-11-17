@@ -43,37 +43,35 @@ jobs:
             # Command to backup Vault Raft data & Save snapshot with timestamp in the name
             vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap
 
-      - name: Copy snapshot from VM to runner
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.VAULT_IP }}
-          username: ${{ secrets.VAULT_USER }}
-          key: ${{ secrets.VAULT_PRIVATE_KEY }}
-          source: "/vault/raft/raft/snapshots/backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap"
-          target: "."
-      
-      # - name: Convert Key Secret to File
-      #   id: create-key
-      #   run: |
-      #    echo "${{ secrets.VAULT_PRIVATE_KEY }}" > private_key && chmod 600 private_key
-      #    ls -al ~/
-      #    scp -o "StrictHostKeyChecking no" -i private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap .
-      #    ls ./
-
-      # - name: Upload Snapshot to Azure Storage
-      #   uses: azure/CLI@v1
-      #   env: 
-      #     RAFT_SNAPSHOT: ${{ steps.ssh-vault-vm.outputs.RAFT_SNAPSHOT }}
+      # - name: Copy snapshot from VM to runner
+      #   uses: appleboy/scp-action@v0.1.4
       #   with:
-      #     azcliversion: 2.0.78
-      #     inlineScript: |
-      #       az login --service-principal --username ${{ secrets.ARM_CLIENT_ID }} --password ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
+      #     host: ${{ secrets.VAULT_IP }}
+      #     username: ${{ secrets.VAULT_USER }}
+      #     key: ${{ secrets.VAULT_PRIVATE_KEY }}
+      #     source: "/vault/raft/raft/snapshots/backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap"
+      #     target: "."
+      
+      - name: Convert Key Secret to File
+        id: create-key
+        run: |
+         echo "${{ secrets.VAULT_PRIVATE_KEY }}" > private_key && chmod 600 private_key
+         ls -al ~/
+         scp -o "StrictHostKeyChecking no" -i private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap .
+         ls ./
 
-      #       az account set --subscription ${{ secrets.ARM_NPVAULT_SUB }}
+      - name: Upload Snapshot to Azure Storage
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.78
+          inlineScript: |
+            az login --service-principal --username ${{ secrets.ARM_CLIENT_ID }} --password ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
+
+            az account set --subscription ${{ secrets.ARM_NPVAULT_SUB }}
             
-      #       az storage blob upload \
-      #         --account-name ${{ secrets.ARM_SA }} \
-      #         --container-name ${{ secrets.ARM_SC }} \
-      #         --name backup_${TIMESTAMP}.snap \
-      #         --type block \
-      #         --file "$RAFT_SNAPSHOT"
+            az storage blob upload \
+              --account-name ${{ secrets.ARM_SA }} \
+              --container-name ${{ secrets.ARM_SC }} \
+              --name backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap \
+              --type block \
+              --file "backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap"
