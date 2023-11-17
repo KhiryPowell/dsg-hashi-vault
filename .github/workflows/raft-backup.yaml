@@ -56,10 +56,9 @@ jobs:
         id: create-key
         run: |
          echo "${{ secrets.VAULT_PRIVATE_KEY }}" > private_key && chmod 600 private_key
-         ls -al ~/
          scp -o "StrictHostKeyChecking no" -i private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap .
          ls ./
-
+            
       - name: Upload Snapshot to Azure Storage
         uses: azure/CLI@v1
         with:
@@ -75,3 +74,13 @@ jobs:
               --name backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap \
               --type block \
               --file "backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap"
+
+      - name: Remove Raft Backups
+        id: clean-up-vm
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VAULT_IP }}
+          username: ${{ secrets.VAULT_USER }}
+          key: ${{ secrets.VAULT_PRIVATE_KEY }}
+          script: |
+            rm -f /vault/raft/raft/snapshots/backup_*    
