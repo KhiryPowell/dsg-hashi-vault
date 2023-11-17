@@ -50,7 +50,7 @@ jobs:
       - name: Convert Key Secret to File
         id: create-key
         run: |
-         echo backup_${TIMESTAMP}.snap
+         echo "backup_$TIMESTAMP.snap"
          echo "${{ secrets.VAULT_PRIVATE_KEY }}" > private_key && chmod 600 private_key
          ls -al ~/
          scp -o "StrictHostKeyChecking no" -i private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
