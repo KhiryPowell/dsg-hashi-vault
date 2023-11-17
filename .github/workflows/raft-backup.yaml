@@ -58,7 +58,8 @@ jobs:
          echo "${{ secrets.VAULT_PRIVATE_KEY }}" > private_key && chmod 600 private_key
          ls -al ~/
          scp -o "StrictHostKeyChecking no" -i private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${{ steps.timestamp.outputs.TIMESTAMP }}.snap .
-          
+         ls ./
+
       # - name: Upload Snapshot to Azure Storage
       #   uses: azure/CLI@v1
       #   env: 
