@@ -34,26 +34,28 @@ jobs:
             
             # Generate a timestamp
             export TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+
+            echo TIMESTAMP=$TIMESTAMP >> $GITHUB_OUTPUT
             
             # Command to backup Vault Raft data & Save snapshot with timestamp in the name
             vault operator raft snapshot save /vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap
 
-      # - name: Copy snapshot from VM to runner
-      #   uses: appleboy/scp-action@v0.1.4
-      #   with:
-      #     host: ${{ secrets.VAULT_IP }}
-      #     username: ${{ secrets.VAULT_USER }}
-      #     key: ${{ secrets.VAULT_PRIVATE_KEY }}
-      #     source: "/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap"
-      #     target: "./backup_${TIMESTAMP}.snap"
+      - name: Copy snapshot from VM to runner
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VAULT_IP }}
+          username: ${{ secrets.VAULT_USER }}
+          key: ${{ secrets.VAULT_PRIVATE_KEY }}
+          source: "/vault/raft/raft/snapshots/backup_${{ steps.ssh-vault-vm.outputs.TIMESTAMP }}.snap"
+          target: "./backup_${{ steps.ssh-vault-vm.outputs.TIMESTAMP }}.snap"
       
-      - name: Convert Key Secret to File
-        id: create-key
-        run: |
-         echo "backup_$TIMESTAMP.snap"
-         echo "${{ secrets.VAULT_PRIVATE_KEY }}" > private_key && chmod 600 private_key
-         ls -al ~/
-         scp -o "StrictHostKeyChecking no" -i private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
+      # - name: Convert Key Secret to File
+      #   id: create-key
+      #   run: |
+      #    echo "backup_$TIMESTAMP.snap"
+      #    echo "${{ secrets.VAULT_PRIVATE_KEY }}" > private_key && chmod 600 private_key
+      #    ls -al ~/
+      #    scp -o "StrictHostKeyChecking no" -i private_key ${{ secrets.VAULT_USER }}@${{ secrets.VAULT_IP }}:/vault/raft/raft/snapshots/backup_${TIMESTAMP}.snap .
           
       # - name: Upload Snapshot to Azure Storage
       #   uses: azure/CLI@v1
