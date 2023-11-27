@@ -40,3 +40,30 @@ resource "azurerm_key_vault_access_policy" "DeveloperEnablement" {
     "WrapKey"
   ]
 }
+
+resource "azurerm_key_vault_access_policy" "sp" {
+  key_vault_id = module.keyvault.key_vault_id
+  tenant_id    = "e04b15c8-7a1e-4390-9b5b-28c7c205a233"
+  object_id    = "b7a8b3d3-b633-474b-8958-d50bada72538"
+  certificate_permissions = []
+  secret_permissions = []
+  storage_permissions = []
+  key_permissions = [
+    "Backup",
+    "Create",
+    "Decrypt",
+    "Delete",
+    "Encrypt",
+    "Get",
+    "Import",
+    "List",
+    "Purge",
+    "Recover",
+    "Restore",
+    "Sign",
+    "UnwrapKey",
+    "Update",
+    "Verify",
+    "WrapKey"
+  ]
+}

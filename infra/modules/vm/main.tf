@@ -19,6 +19,9 @@ resource "azurerm_network_interface" "vm" {
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Dynamic"
   }
+  tags = {
+    hashicorp = "vault"
+  }
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "vault_backend_pool" {

@@ -47,9 +47,11 @@ ssh -i ~/.ssh/vault_tls_private_key05 azureuser@{ip address of vm05}
 
 Install Consul binary 1.8.2 and configure Consul first on all 5 vms to create a HA cluster
 Install Vault binary 1.5.4 on vm01 and vm02 after Consul is configured
+https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide
 
 Place tools tls certs for Vault in the following path 
 ```
+scp -i ~/.ssh/vault_tls_private_key05 ~/Downloads/cert.* azureuser@10.176.64.135:~/
 cp cert.ca /etc/ssl/certs/
 cp cert.cer /etc/ssl/certs/
 cp cert.key /etc/ssl/certs/

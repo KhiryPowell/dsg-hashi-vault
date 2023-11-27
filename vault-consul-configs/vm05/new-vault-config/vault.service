@@ -14,10 +14,10 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-User=azureuser
-Group=azureuser
+User=vault
+Group=vault
 PIDFile=/run/vault/vault.pid
-ExecStart=/usr/bin/vault server -config=/etc/vault.d/vault_s5.hcl -log-level=debug
+ExecStart=/usr/bin/vault server -config=/etc/vault.d/vault.hcl -log-level=debug
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 KillSignal=SIGTERM
