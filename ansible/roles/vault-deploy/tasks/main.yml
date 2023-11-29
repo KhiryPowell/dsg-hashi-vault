@@ -1,7 +1,7 @@
 ---
   - name: Replace text in vault config
     debug: 
-      var: tenant_id
+      msg: "from role level {{ role_var }} from playbook level {{ play_var }}"
   
   - name: Install unzip
     package:

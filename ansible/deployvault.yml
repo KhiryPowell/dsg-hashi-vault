@@ -2,4 +2,4 @@
 - hosts: vaultservers
   roles:
     - role: vault-deploy
-      vars_files: "roles/vault-deploy/files/secret.yml"   
+      play_var: "test"
