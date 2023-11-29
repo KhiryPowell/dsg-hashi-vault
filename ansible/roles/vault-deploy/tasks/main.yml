@@ -35,6 +35,20 @@
       owner: azureuser
       group: azureuser
 
+  - name: Copy certs
+    copy: 
+      src: "{{ item.src }}" 
+      dest: "{{ item.dest }}" #/etc/ssl/certs/
+      owner: azureuser
+      group: azureuser
+    loop: 
+      - src: cert.ca
+        dest: /etc/ssl/certs/
+      - src: cert.cer
+        dest: /etc/ssl/certs/
+      - src: cert.key
+        dest: /etc/ssl/certs/
+
   - name: Copy consul service to server
     copy: 
       src: consul.service 
