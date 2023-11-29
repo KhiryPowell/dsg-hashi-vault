@@ -1,10 +1,14 @@
 ---
+  - name: Replace text in vault config
+    debug: 
+      var: tenant_id
+  
   - name: Install unzip
     package:
       name: unzip
       update_cache: yes
     become: true
-  
+
   - name: Download and install consul binary
     unarchive:
       src: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
