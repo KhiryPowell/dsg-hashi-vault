@@ -2,3 +2,4 @@
 - hosts: consulservers
   roles:
     - role: consul-deploy
+  become: true

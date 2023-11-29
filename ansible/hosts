@@ -3,6 +3,3 @@
 
 [consulservers]
 10.176.64.132 ansible_ssh_user=azureuser ansible_ssh_private_key_file=~/.ssh/vault_tls_private_key_consul
-
-[consulservers:vars]
-consul_version=1.8.2

@@ -1,32 +1,50 @@
 ---
-  - name: Install unzip
-    package:
-      name: unzip
+  - name: Print remote host name
+    debug:
+      var: ansible_hostname
+
+  - name: Update apt cache
+    apt:
       update_cache: yes
-    become: true
+
+  - name: Install dependencies
+    apt:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - unzip
+      - jq
 
   - name: Download and install consul binary
     unarchive:
       src: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
       dest: /usr/bin/
-      remote_src: True
-    become: true
+      remote_src: true
 
   - name: Create consul config directory
-    file: state=directory path=/etc/opt/consul/
-    become: true
+    file: 
+      state: directory 
+      path: /etc/opt/consul/
+      owner: azureuser
+      group: azureuser
 
   - name: Copy consul config to server
-    copy: src=consul_s.json dest=/etc/opt/consul/
-    become: true
+    copy: 
+      src: consul_s.json 
+      dest: /etc/opt/consul/
+      owner: azureuser
+      group: azureuser
 
   - name: Copy consul service to server
-    copy: src=consul.service dest=/usr/lib/systemd/system/consul.service
-    become: true
+    copy: 
+      src: consul.service 
+      dest: /usr/lib/systemd/system/consul.service
+      owner: azureuser
+      group: azureuser
 
   - name: Start consul service
     systemd:
       state: started
       name: consul
+      enabled: yes
       daemon_reload: yes
-    become: true
