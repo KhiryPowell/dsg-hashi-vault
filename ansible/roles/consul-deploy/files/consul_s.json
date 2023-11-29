@@ -6,7 +6,7 @@
     "bind_addr": "0.0.0.0",
     "client_addr": "0.0.0.0",
     "advertise_addr": "10.176.64.132",
-    "bootstrap_expect": 3,
+    "bootstrap_expect": 1,
     "ui": true,
     "log_level": "DEBUG",
     "enable_syslog": true,

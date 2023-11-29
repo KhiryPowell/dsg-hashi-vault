@@ -17,7 +17,7 @@ After=network-online.target
 User=azureuser
 Group=azureuser
 PIDFile=/run/vault/vault.pid
-ExecStart=/usr/bin/vault server -config=/etc/vault/vault_s1.hcl -log-level=debug
+ExecStart=/usr/bin/vault server -config=/etc/opt/vault/vault_s.hcl -log-level=debug
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 KillSignal=SIGTERM

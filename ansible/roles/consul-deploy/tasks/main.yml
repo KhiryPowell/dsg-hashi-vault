@@ -4,7 +4,7 @@
       name: unzip
       update_cache: yes
     become: true
-  
+
   - name: Download and install consul binary
     unarchive:
       src: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
@@ -17,7 +17,7 @@
     become: true
 
   - name: Copy consul config to server
-    copy: src=consul_c.json dest=/etc/opt/consul/
+    copy: src=consul_s.json dest=/etc/opt/consul/
     become: true
 
   - name: Copy consul service to server
@@ -28,31 +28,5 @@
     systemd:
       state: started
       name: consul
-      daemon_reload: yes
-    become: true
-
-  - name: Download and install vault binary
-    unarchive:
-      src: "https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip"
-      dest: /usr/bin/
-      remote_src: True
-    become: true
-
-  - name: Create vault config directory
-    file: state=directory path=/etc/opt/vault/
-    become: true
-
-  - name: Copy vault config to server
-    copy: src=vault_s.hcl dest=/etc/opt/vault/
-    become: true
-
-  - name: Copy vault service to server
-    copy: src=vault.service dest=/usr/lib/systemd/system/vault.service
-    become: true
-
-  - name: Start vault service
-    systemd:
-      state: started
-      name: vault
       daemon_reload: yes
     become: true
