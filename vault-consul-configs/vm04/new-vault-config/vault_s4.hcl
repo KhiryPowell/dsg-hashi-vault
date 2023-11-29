@@ -8,7 +8,7 @@ listener "tcp" {
 
 storage "raft" {
   path = "/vault/raft/"
-  node_id = "node_4"
+  node_id = "node_4" #use ansible variable "ansible_hostname"
 
   retry_join {
     leader_tls_servername   = "vault-az-np.tools.dcsg.com"

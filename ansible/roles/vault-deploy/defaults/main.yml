@@ -1,0 +1,8 @@
+vault_version: 1.5.4
+consul_version: 1.8.2
+vault_name: "dsgplatformvault"
+key_name: "vn01-pks-vault"
+api_addr: "https://vault-az-np.tools.dcsg.com:8200"
+tenant_id: "{{ vault_tenant_id }}"
+client_id: "{{ vault_client_id }}"
+client_secret: "{{ vault_client_secret }}"

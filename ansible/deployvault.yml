@@ -2,4 +2,4 @@
 - hosts: vaultservers
   roles:
     - role: vault-deploy
-      play_var: "test"
+  become: true

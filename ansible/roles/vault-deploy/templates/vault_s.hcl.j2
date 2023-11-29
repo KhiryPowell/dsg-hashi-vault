@@ -1,6 +1,6 @@
 listener "tcp" {
   address          = "0.0.0.0:8200"
-  cluster_address  = "10.176.64.133:8201"
+  cluster_address  = "{{ ansible_eth0.ipv4.address }}:8201"
   tls_disable      = 0
   tls_ca_file   = "/etc/ssl/certs/cert.ca"
   tls_cert_file = "/etc/ssl/certs/cert.cer"
@@ -14,13 +14,13 @@ storage "consul" {
 }
 
 seal "azurekeyvault" {
- tenant_id = ""
- client_id = ""
- client_secret = ""
- vault_name = "dsgplatformvault"
- key_name = "vn01-pks-vault"
+ tenant_id = "{{ tenant_id }}"
+ client_id = "{{ client_id }}"
+ client_secret = "{{ client_secret }}"
+ vault_name = "{{ vault_name }}"
+ key_name = "{{ key_name }}"
  }
 
 ui = true
-api_addr = "https://vault-az-np.tools.dcsg.com:8200"
-cluster_addr = "https://10.176.64.133:8201"
+api_addr = "{{ api_addr }}"
+cluster_addr = "https://{{ ansible_eth0.ipv4.address }}:8201"
